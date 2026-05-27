@@ -59,6 +59,10 @@ function QnAPage() {
 
   useEffect(() => {
     setUpvoted(getUpvotedSet());
+    try {
+      if (localStorage.getItem(ADMIN_STORAGE_KEY) === "1") setIsAdmin(true);
+    } catch { /* ignore */ }
+
 
     let isMounted = true;
     (async () => {
