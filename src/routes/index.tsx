@@ -193,11 +193,38 @@ function QnAPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="sticky top-0 z-10 bg-background border-b border-border">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <h1 className="text-xl font-bold tracking-tight">Live Q&amp;A</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            질문을 남기고 좋은 질문에 추천을 눌러주세요.
-          </p>
+        <div className="max-w-2xl mx-auto px-4 py-4 flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">Live Q&amp;A</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              질문을 남기고 좋은 질문에 추천을 눌러주세요.
+            </p>
+          </div>
+          {isAdmin ? (
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={handleResetAll}
+                className="h-8 px-3 rounded-md bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90"
+              >
+                전체 초기화
+              </button>
+              <button
+                onClick={logoutAdmin}
+                aria-label="관리자 로그아웃"
+                className="h-8 w-8 flex items-center justify-center rounded-md border border-border text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowAdminPrompt(true)}
+              aria-label="관리자"
+              className="h-8 w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted shrink-0"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </header>
 
