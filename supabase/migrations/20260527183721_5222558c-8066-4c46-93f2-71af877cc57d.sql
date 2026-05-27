@@ -1,0 +1,1 @@
+CREATE POLICY "Anyone can delete questions" ON public.questions FOR DELETE TO anon, authenticated USING (true);

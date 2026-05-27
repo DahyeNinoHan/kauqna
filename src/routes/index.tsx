@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowBigUp, Send } from "lucide-react";
+import { ArrowBigUp, Send, Settings, Trash2, X } from "lucide-react";
+
+const ADMIN_CODE = "admin1234";
+const ADMIN_STORAGE_KEY = "qna_is_admin_v1";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -48,10 +51,18 @@ function QnAPage() {
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showAdminPrompt, setShowAdminPrompt] = useState(false);
+  const [adminInput, setAdminInput] = useState("");
+  const [adminError, setAdminError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setUpvoted(getUpvotedSet());
+    try {
+      if (localStorage.getItem(ADMIN_STORAGE_KEY) === "1") setIsAdmin(true);
+    } catch { /* ignore */ }
+
 
     let isMounted = true;
     (async () => {
@@ -142,14 +153,78 @@ function QnAPage() {
     }
   }
 
+  function submitAdminCode(e: React.FormEvent) {
+    e.preventDefault();
+    if (adminInput === ADMIN_CODE) {
+      setIsAdmin(true);
+      try { localStorage.setItem(ADMIN_STORAGE_KEY, "1"); } catch { /* ignore */ }
+      setShowAdminPrompt(false);
+      setAdminInput("");
+      setAdminError("");
+    } else {
+      setAdminError("잘못된 코드입니다.");
+    }
+  }
+
+  function logoutAdmin() {
+    setIsAdmin(false);
+    try { localStorage.removeItem(ADMIN_STORAGE_KEY); } catch { /* ignore */ }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("이 질문을 삭제하시겠습니까?")) return;
+    const prev = questions;
+    setQuestions((p) => p.filter((q) => q.id !== id));
+    const { error } = await supabase.from("questions").delete().eq("id", id);
+    if (error) setQuestions(prev);
+  }
+
+  async function handleResetAll() {
+    if (!confirm("모든 질문을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) return;
+    const prev = questions;
+    setQuestions([]);
+    const { error } = await supabase.from("questions").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    if (error) {
+      setQuestions(prev);
+      alert("초기화 실패: " + error.message);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="sticky top-0 z-10 bg-background border-b border-border">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <h1 className="text-xl font-bold tracking-tight">Live Q&amp;A</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            질문을 남기고 좋은 질문에 추천을 눌러주세요.
-          </p>
+        <div className="max-w-2xl mx-auto px-4 py-4 flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">Live Q&amp;A</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              질문을 남기고 좋은 질문에 추천을 눌러주세요.
+            </p>
+          </div>
+          {isAdmin ? (
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={handleResetAll}
+                className="h-8 px-3 rounded-md bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90"
+              >
+                전체 초기화
+              </button>
+              <button
+                onClick={logoutAdmin}
+                aria-label="관리자 로그아웃"
+                className="h-8 w-8 flex items-center justify-center rounded-md border border-border text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowAdminPrompt(true)}
+              aria-label="관리자"
+              className="h-8 w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted shrink-0"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </header>
 
@@ -192,6 +267,15 @@ function QnAPage() {
                   <p className="flex-1 text-[15px] leading-relaxed break-words self-center whitespace-pre-wrap">
                     {q.text}
                   </p>
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleDelete(q.id)}
+                      aria-label="삭제"
+                      className="self-center h-8 w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
                 </li>
               );
             })}
@@ -223,6 +307,46 @@ function QnAPage() {
           </button>
         </div>
       </form>
+
+      {showAdminPrompt && (
+        <div
+          className="fixed inset-0 z-20 bg-black/50 flex items-center justify-center p-4"
+          onClick={() => { setShowAdminPrompt(false); setAdminError(""); setAdminInput(""); }}
+        >
+          <form
+            onSubmit={submitAdminCode}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-background rounded-lg border border-border w-full max-w-sm p-5"
+          >
+            <h2 className="text-base font-bold">관리자 코드</h2>
+            <p className="text-sm text-muted-foreground mt-1">코드를 입력하면 질문을 관리할 수 있습니다.</p>
+            <input
+              type="password"
+              autoFocus
+              value={adminInput}
+              onChange={(e) => { setAdminInput(e.target.value); setAdminError(""); }}
+              placeholder="관리자 코드"
+              className="mt-4 w-full h-10 px-3 rounded-md bg-muted border border-transparent focus:bg-background focus:border-primary focus:outline-none text-[15px]"
+            />
+            {adminError && <p className="text-xs text-destructive mt-2">{adminError}</p>}
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => { setShowAdminPrompt(false); setAdminError(""); setAdminInput(""); }}
+                className="h-9 px-4 rounded-md text-sm border border-border hover:bg-muted"
+              >
+                취소
+              </button>
+              <button
+                type="submit"
+                className="h-9 px-4 rounded-md text-sm bg-primary text-primary-foreground font-semibold hover:opacity-90"
+              >
+                확인
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
