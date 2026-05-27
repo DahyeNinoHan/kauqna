@@ -51,6 +51,10 @@ function QnAPage() {
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showAdminPrompt, setShowAdminPrompt] = useState(false);
+  const [adminInput, setAdminInput] = useState("");
+  const [adminError, setAdminError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
