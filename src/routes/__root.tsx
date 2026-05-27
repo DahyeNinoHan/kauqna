@@ -72,14 +72,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Live Q&A" },
+      { name: "description", content: "질문을 남기고 좋은 질문에 추천을 눌러주세요." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Live Q&A" },
+      { property: "og:description", content: "질문을 남기고 좋은 질문에 추천을 눌러주세요." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Live Q&A" },
+      { name: "twitter:description", content: "질문을 남기고 좋은 질문에 추천을 눌러주세요." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1e3e2aba-e35d-491b-8957-d971866bb3c5/id-preview-424031a1--5095af61-68e3-4e5d-9aa0-8ba09d5a2c62.lovable.app-1779907271434.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1e3e2aba-e35d-491b-8957-d971866bb3c5/id-preview-424031a1--5095af61-68e3-4e5d-9aa0-8ba09d5a2c62.lovable.app-1779907271434.png" },
     ],
     links: [
       {
