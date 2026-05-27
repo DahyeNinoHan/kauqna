@@ -307,6 +307,46 @@ function QnAPage() {
           </button>
         </div>
       </form>
+
+      {showAdminPrompt && (
+        <div
+          className="fixed inset-0 z-20 bg-black/50 flex items-center justify-center p-4"
+          onClick={() => { setShowAdminPrompt(false); setAdminError(""); setAdminInput(""); }}
+        >
+          <form
+            onSubmit={submitAdminCode}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-background rounded-lg border border-border w-full max-w-sm p-5"
+          >
+            <h2 className="text-base font-bold">관리자 코드</h2>
+            <p className="text-sm text-muted-foreground mt-1">코드를 입력하면 질문을 관리할 수 있습니다.</p>
+            <input
+              type="password"
+              autoFocus
+              value={adminInput}
+              onChange={(e) => { setAdminInput(e.target.value); setAdminError(""); }}
+              placeholder="관리자 코드"
+              className="mt-4 w-full h-10 px-3 rounded-md bg-muted border border-transparent focus:bg-background focus:border-primary focus:outline-none text-[15px]"
+            />
+            {adminError && <p className="text-xs text-destructive mt-2">{adminError}</p>}
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => { setShowAdminPrompt(false); setAdminError(""); setAdminInput(""); }}
+                className="h-9 px-4 rounded-md text-sm border border-border hover:bg-muted"
+              >
+                취소
+              </button>
+              <button
+                type="submit"
+                className="h-9 px-4 rounded-md text-sm bg-primary text-primary-foreground font-semibold hover:opacity-90"
+              >
+                확인
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
