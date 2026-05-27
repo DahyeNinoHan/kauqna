@@ -153,6 +153,43 @@ function QnAPage() {
     }
   }
 
+  function submitAdminCode(e: React.FormEvent) {
+    e.preventDefault();
+    if (adminInput === ADMIN_CODE) {
+      setIsAdmin(true);
+      try { localStorage.setItem(ADMIN_STORAGE_KEY, "1"); } catch { /* ignore */ }
+      setShowAdminPrompt(false);
+      setAdminInput("");
+      setAdminError("");
+    } else {
+      setAdminError("잘못된 코드입니다.");
+    }
+  }
+
+  function logoutAdmin() {
+    setIsAdmin(false);
+    try { localStorage.removeItem(ADMIN_STORAGE_KEY); } catch { /* ignore */ }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("이 질문을 삭제하시겠습니까?")) return;
+    const prev = questions;
+    setQuestions((p) => p.filter((q) => q.id !== id));
+    const { error } = await supabase.from("questions").delete().eq("id", id);
+    if (error) setQuestions(prev);
+  }
+
+  async function handleResetAll() {
+    if (!confirm("모든 질문을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) return;
+    const prev = questions;
+    setQuestions([]);
+    const { error } = await supabase.from("questions").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    if (error) {
+      setQuestions(prev);
+      alert("초기화 실패: " + error.message);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="sticky top-0 z-10 bg-background border-b border-border">
