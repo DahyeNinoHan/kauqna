@@ -267,6 +267,15 @@ function QnAPage() {
                   <p className="flex-1 text-[15px] leading-relaxed break-words self-center whitespace-pre-wrap">
                     {q.text}
                   </p>
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleDelete(q.id)}
+                      aria-label="삭제"
+                      className="self-center h-8 w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
                 </li>
               );
             })}
