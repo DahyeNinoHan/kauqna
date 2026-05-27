@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowBigUp, Send } from "lucide-react";
+import { ArrowBigUp, Send, Settings, Trash2, X } from "lucide-react";
+
+const ADMIN_CODE = "admin1234";
+const ADMIN_STORAGE_KEY = "qna_is_admin_v1";
 
 export const Route = createFileRoute("/")({
   head: () => ({
