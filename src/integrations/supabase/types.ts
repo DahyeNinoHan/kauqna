@@ -14,33 +14,203 @@ export type Database = {
   }
   public: {
     Tables: {
-      questions: {
+      events: {
+        Row: {
+          activated_at: string | null
+          allow_anonymous: boolean
+          closed_at: string | null
+          code: string
+          created_at: string
+          id: string
+          owner_id: string
+          paid: boolean
+          require_moderation: boolean
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          activated_at?: string | null
+          allow_anonymous?: boolean
+          closed_at?: string | null
+          code: string
+          created_at?: string
+          id?: string
+          owner_id: string
+          paid?: boolean
+          require_moderation?: boolean
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          activated_at?: string | null
+          allow_anonymous?: boolean
+          closed_at?: string | null
+          code?: string
+          created_at?: string
+          id?: string
+          owner_id?: string
+          paid?: boolean
+          require_moderation?: boolean
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      free_event_usage: {
         Row: {
           created_at: string
           id: string
-          text: string
-          upvotes: number
+          updated_at: string
+          used_count: number
+          user_id: string
+          year_month: string
         }
         Insert: {
           created_at?: string
           id?: string
-          text: string
-          upvotes?: number
+          updated_at?: string
+          used_count?: number
+          user_id: string
+          year_month: string
         }
         Update: {
           created_at?: string
           id?: string
+          updated_at?: string
+          used_count?: number
+          user_id?: string
+          year_month?: string
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          currency: string
+          event_id: string | null
+          id: string
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          currency?: string
+          event_id?: string | null
+          id?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          event_id?: string | null
+          id?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          author_nickname: string | null
+          created_at: string
+          event_id: string
+          id: string
+          is_flagged: boolean
+          is_hidden: boolean
+          is_pinned: boolean
+          moderation_status: string
+          text: string
+          upvotes: number
+        }
+        Insert: {
+          author_nickname?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          is_flagged?: boolean
+          is_hidden?: boolean
+          is_pinned?: boolean
+          moderation_status?: string
+          text: string
+          upvotes?: number
+        }
+        Update: {
+          author_nickname?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          is_flagged?: boolean
+          is_hidden?: boolean
+          is_pinned?: boolean
+          moderation_status?: string
           text?: string
           upvotes?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "questions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_event_active: { Args: { _event_id: string }; Returns: boolean }
+      is_event_owner: { Args: { _event_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
